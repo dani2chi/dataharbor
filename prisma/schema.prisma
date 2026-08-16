@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model ScrapeJob {
+  id                  String   @id @default(cuid())
+  name                String
+  sourceType          String   // DEMO_DIRECTORY | CUSTOM_HTML | SEARCH_RESULTS | REVIEW_PAGES
+  startUrl            String
+  category            String
+  location            String
+  maxPages            Int      @default(5)
+  outputFormats       String   // CSV (comma-sep)
+  deduplicate         Boolean  @default(true)
+  validateUrls        Boolean  @default(true)
+  status              String   @default("QUEUED") // QUEUED | RUNNING | COMPLETED | COMPLETED_WITH_WARNINGS | FAILED
+  totalPages          Int      @default(0)
+  pagesProcessed      Int      @default(0)
+  recordsExtracted    Int      @default(0)
+  validRecords        Int      @default(0)
+  duplicatesRemoved   Int      @default(0)
+  failedPages         Int      @default(0)
+  runtimeSeconds      Float    @default(0)
+  createdAt           DateTime @default(now())
+  startedAt           DateTime?
+  completedAt         DateTime?
+
+  records             ExtractedRecord[]
+  logs                ScrapeLog[]
+  exports             ExportFile[]
+}
+
+model ExtractedRecord {
+  id                String   @id @default(cuid())
+  scrapeJobId       String
+  businessName      String
+  category          String
+  website           String?
+  email             String?
+  phone             String?
+  city              String
+  country           String   @default("United Kingdom")
+  rating            Float?
+  reviewCount       Int?
+  description       String?
+  sourceUrl         String
+  validationStatus  String   @default("VALID") // VALID | MISSING_EMAIL | DUPLICATE | INVALID_URL | NEEDS_REVIEW
+  validationIssues  String?  // JSON array
+  createdAt         DateTime @default(now())
+
+  scrapeJob         ScrapeJob @relation(fields: [scrapeJobId], references: [id], onDelete: Cascade)
+}
+
+model ScrapeLog {
+  id            String   @id @default(cuid())
+  scrapeJobId   String
+  level         String   // INFO | WARN | ERROR | SUCCESS
+  message       String
+  metadata      String?
+  createdAt     DateTime @default(now())
+
+  scrapeJob     ScrapeJob @relation(fields: [scrapeJobId], references: [id], onDelete: Cascade)
+}
+
+model ExportFile {
+  id            String   @id @default(cuid())
+  scrapeJobId   String
+  fileName      String
+  format        String   // CSV | JSON | XLSX
+  recordCount   Int
+  filePath      String
+  sizeBytes     Int
+  createdAt     DateTime @default(now())
+
+  scrapeJob     ScrapeJob @relation(fields: [scrapeJobId], references: [id], onDelete: Cascade)
+}
