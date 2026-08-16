@@ -2,7 +2,15 @@
 
 Web scraping and data extraction pipeline. Portfolio piece pairing a real Python scraping engine with a Next.js dashboard so the engineering and the operator experience are both visible.
 
+![DataHarbor extraction dashboard](docs/screenshots/dashboard.png)
+
 > **Portfolio demo.** The pipeline runs against a generated fictional London-hotels directory written to disk as static HTML — no third-party scraping, no surprise rate limits, fully reproducible.
+
+## Screenshots
+
+| Job detail — 7-stage pipeline | Cleaned records |
+| --- | --- |
+| ![Job detail with stage progress and run log](docs/screenshots/job-detail.png) | ![Extracted records with validation badges](docs/screenshots/extracted-data.png) |
 
 ## What's in here
 
